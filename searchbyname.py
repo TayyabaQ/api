@@ -137,6 +137,12 @@ def checkbarcodeid(inbar,name):
         einnumber = content.split('EIN Number: ',1)[1].split('Address',1)[0]
         address = content.split('Address: ',1)[1].split('Phone',1)[0]
         phone = content.split('Phone: ',1)[1]
+        fulladdress = address
+        try:
+            zipcode= fulladdress.split(' ')[-1].split('-')[0]
+            fulladdress = fulladdress.replace(fulladdress.split(' ')[-1],zipcode)
+        except:
+            pass
         address = usaddress.parse(address)
         m = 0
         street = ""
@@ -180,7 +186,9 @@ def checkbarcodeid(inbar,name):
         
         #print(barcode)
         if (str(inbar.strip()) in str(barcode).strip()) or (str(barcode.strip()) in str(inbar.strip())):
-            myresult.append({'name':title,'barcode':barcode,'ein_number':str(einnumber),'street':street,'city':city,'state':state,'zip':pcode,'phone':phone.strip()})
+            myresult.append({'name':title,'barcode':barcode,'ein_number':str(einnumber),'Address':fulladdress,'phone':phone.strip()})
+            
+            #myresult.append({'name':title,'barcode':barcode,'ein_number':str(einnumber),'street':street,'city':city,'state':state,'zip':pcode,'phone':phone.strip()})
                             #return json.dumps({'status':'Found','name':title,'barcode':barcode,'ein_number':str(einnumber),'street':street,'city':city,'state':state,'zip':pcode,'phone':phone.strip()})
             #return json.dumps({'status':'Found','Result':{'name':title,
             #'barcode':barcode,'ein_number':str(einnumber),'street':street,'city':city,'state':state,'zip':pcode,'phone':phone.strip()}})
@@ -190,6 +198,4 @@ def checkbarcodeid(inbar,name):
     else:
         
         return json.dumps({'status':'Not Matched'})
-
-
- 
+    
