@@ -144,7 +144,7 @@ def checkbarcodeid(inbar,name):
             fulladdress = fulladdress.replace(fulladdress.split(' ')[-1],zipcode)
         except:
             pass
-        address = usaddress.parse(address)
+        address = usaddress.parse(fulladdress)
         m = 0
         street = ""
         city = ""
