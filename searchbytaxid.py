@@ -62,16 +62,6 @@ def smarty_streets_validation(input_data):
         try:
             validation_data = make_address_validation_request(provider_data)
             barcode =validation_data.get("delivery_point_barcode","")
-            if not barcode:
-                url = "https://us-extract.api.smartystreets.com/?auth-id=0a78cf64-8c40-b69b-fb42-7d1ed41adec2&auth-token=cppiDIBCvr9XtbMXrSmn"
-                headers = {'content-type': 'application/json'}
-                payload = provider_data
-                r = requests.post(url, headers=headers, data=payload)
-                r.raise_for_status()
-                validation_data = {'result': r.json()}
-                barcode = validation_data.get("delivery_point_barcode","")
-                if not barcode:
-                    barcode = "N/A"
             address_metadata = validation_data.get("metadata",{})
             address_analysis = validation_data.get("analysis",{})
             co = validation_data.get("components",{})
@@ -79,6 +69,9 @@ def smarty_streets_validation(input_data):
             _long = address_metadata.get("longitude","")
             county = address_metadata.get("county_fips","")
             code = address_analysis.get("dpv_match_code","")
+            if not barcode:
+                barcode = "N/A"
+                
             metadata = f"barcode:{barcode}|lat:{lat}|long:{_long}|county:{county}|matchcode:{code}"
         except Exception as e:
                         #print(e)
@@ -187,4 +180,3 @@ def checktaxid(taxid):
            
         #return json.dumps({'status':'Found','Result':{'name':title,'barcode':barcode,'ein_number':str(einnumber),'street':street,'city':city,'state':state,'zip':pcode,'phone':phone.strip()}
            # })
- 
