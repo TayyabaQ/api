@@ -61,18 +61,25 @@ def smarty_streets_validation(input_data):
     for provider_id,provider_data in input_data.items():
         try:
             validation_data = make_address_validation_request(provider_data)
+            barcode =validation_data.get("delivery_point_barcode","")
+            if not barcode:
+                url = "https://us-extract.api.smartystreets.com/?auth-id=0a78cf64-8c40-b69b-fb42-7d1ed41adec2&auth-token=cppiDIBCvr9XtbMXrSmn"
+                headers = {'content-type': 'application/json'}
+                payload = provider_data
+                r = requests.post(url, headers=headers, data=payload)
+                r.raise_for_status()
+                validation_data = {'result': r.json()}
+                barcode = validation_data.get("delivery_point_barcode","")
+                if not barcode:
+                    barcode = "N/A"
             address_metadata = validation_data.get("metadata",{})
             address_analysis = validation_data.get("analysis",{})
             co = validation_data.get("components",{})
-            barcode =validation_data.get("delivery_point_barcode","")
             lat = address_metadata.get("latitude","")
             _long = address_metadata.get("longitude","")
             county = address_metadata.get("county_fips","")
             code = address_analysis.get("dpv_match_code","")
-            if not barcode:
-                barcode = "N/A"
             metadata = f"barcode:{barcode}|lat:{lat}|long:{_long}|county:{county}|matchcode:{code}"
-                
         except Exception as e:
                         #print(e)
             error = 'yes'
@@ -101,6 +108,12 @@ def smarty_streets_validation(input_data):
         
     return bar
 
+def Remove(duplicate):
+    final_list = []
+    for num in duplicate:
+        if num.strip() not in final_list:
+            final_list.append(num.strip())
+    return ', '.join(final_list)
 
 def checktaxid(taxid):
     headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36',
@@ -124,7 +137,14 @@ def checktaxid(taxid):
         title = content.split('EIN Number',1)[0]
         einnumber = content.split('EIN Number: ',1)[1].split('Address',1)[0]
         address = content.split('Address: ',1)[1].split('Phone',1)[0]
+        print(address)
         phone = content.split('Phone: ',1)[1]
+        fulladdress = Remove(address.split(","))
+        try:
+            zipcode= fulladdress.split(' ')[-1].split('-')[0]
+            fulladdress = fulladdress.replace(fulladdress.split(' ')[-1],zipcode)
+        except:
+            pass
         address = usaddress.parse(address)
         m = 0
         street = ""
@@ -162,12 +182,9 @@ def checktaxid(taxid):
            
        
 
-        
-        return json.dumps({'status':'Found','Result':{'name':title,'barcode':barcode,'ein_number':str(einnumber),'street':street,'city':city,'state':state,'zip':pcode,'phone':phone.strip()}
-            })
-        
-    
-
-
-
+        return json.dumps({'status':'Found','Result':{'name':title,'barcode':barcode,'ein_number':str(einnumber),'Address':fulladdress,
+                                                      'phone':phone.strip()}})
+           
+        #return json.dumps({'status':'Found','Result':{'name':title,'barcode':barcode,'ein_number':str(einnumber),'street':street,'city':city,'state':state,'zip':pcode,'phone':phone.strip()}
+           # })
  
