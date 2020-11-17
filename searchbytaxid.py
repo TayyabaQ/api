@@ -138,7 +138,7 @@ def checktaxid(taxid):
             fulladdress = fulladdress.replace(fulladdress.split(' ')[-1],zipcode)
         except:
             pass
-        address = usaddress.parse(address)
+        address = usaddress.parse(fulladdress)
         m = 0
         street = ""
         city = ""
@@ -171,9 +171,6 @@ def checktaxid(taxid):
         except Exception as e:
             print(e)
             return json.dumps({'status':'Error'})
-            
-           
-       
 
         return json.dumps({'status':'Found','Result':{'name':title,'barcode':barcode,'ein_number':str(einnumber),'Address':fulladdress,
                                                       'phone':phone.strip()}})
