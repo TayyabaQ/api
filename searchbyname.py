@@ -102,7 +102,12 @@ def smarty_streets_validation(input_data):
     return bar
 
 
-
+def Remove(duplicate):
+    final_list = []
+    for num in duplicate:
+        if num.strip() not in final_list:
+            final_list.append(num.strip())
+    return ', '.join(final_list)
 
 def checkbarcodeid(inbar,name):
     myresult = []
@@ -116,7 +121,6 @@ def checkbarcodeid(inbar,name):
     if len(inbar) < 2 and len(name) < 2:
         return json.dumps({'status':'Error'})
     
-    
     inputstr = name
     if len(inputstr) > 2:
         myquery = str(inputstr)
@@ -127,9 +131,6 @@ def checkbarcodeid(inbar,name):
         if len(divlist) == 0:
             return json.dumps({'status':'Not Found'})
     
-   
-
-    
     for div in divlist:   
         companylink = 'https://eintaxid.com' + soup.find('a')['href']
         content = div.text.lstrip()
@@ -137,7 +138,7 @@ def checkbarcodeid(inbar,name):
         einnumber = content.split('EIN Number: ',1)[1].split('Address',1)[0]
         address = content.split('Address: ',1)[1].split('Phone',1)[0]
         phone = content.split('Phone: ',1)[1]
-        fulladdress = address
+        fulladdress = Remove(address.split(","))
         try:
             zipcode= fulladdress.split(' ')[-1].split('-')[0]
             fulladdress = fulladdress.replace(fulladdress.split(' ')[-1],zipcode)
@@ -183,19 +184,11 @@ def checkbarcodeid(inbar,name):
         except:
             pass
 
-        
-        #print(barcode)
         if (str(inbar.strip()) in str(barcode).strip()) or (str(barcode.strip()) in str(inbar.strip())):
             myresult.append({'name':title,'barcode':barcode,'ein_number':str(einnumber),'Address':fulladdress,'phone':phone.strip()})
-            
-            #myresult.append({'name':title,'barcode':barcode,'ein_number':str(einnumber),'street':street,'city':city,'state':state,'zip':pcode,'phone':phone.strip()})
-                            #return json.dumps({'status':'Found','name':title,'barcode':barcode,'ein_number':str(einnumber),'street':street,'city':city,'state':state,'zip':pcode,'phone':phone.strip()})
-            #return json.dumps({'status':'Found','Result':{'name':title,
-            #'barcode':barcode,'ein_number':str(einnumber),'street':street,'city':city,'state':state,'zip':pcode,'phone':phone.strip()}})
             
     if len(myresult) > 0:
         return json.dumps({'status':'Found','Result':myresult})
     else:
         
         return json.dumps({'status':'Not Matched'})
-    
