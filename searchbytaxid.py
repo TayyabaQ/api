@@ -170,7 +170,8 @@ def checktaxid(taxid):
                 pass
         except Exception as e:
             print(e)
-            return json.dumps({'status':'Error'})
+            return json.dumps({'status':'Found','Result':{'name':title,'barcode':"N/A",'ein_number':str(einnumber),'Address':fulladdress,
+                                                      'phone':phone.strip()}})
 
         return json.dumps({'status':'Found','Result':{'name':title,'barcode':barcode,'ein_number':str(einnumber),'Address':fulladdress,
                                                       'phone':phone.strip()}})
