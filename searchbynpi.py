@@ -172,8 +172,14 @@ def checknpiid(npiid):
             if "Classification" in n:
                 classif = n.replace("Classification", "")
     phone = soup.find( "div", {"id":"npi-addresses"} )
-    fax = phone.get_text().split("Phone:")[1].strip().split("\n")[0].split("Fax")[1].strip().replace(":","").strip()
-    phone = phone.get_text().split("Phone:")[1].strip().split("\n")[0].split("Fax")[0].strip()
+    try:
+        fax = phone.get_text().split("Phone:")[1].strip().split("\n")[0].split("Fax")[1].strip().replace(":","").strip()
+    except:
+        fax = "N/A"
+    try:
+        phone = phone.get_text().split("Phone:")[1].strip().split("\n")[0].split("Fax")[0].strip()
+    except:
+        phone = "N/A"
     street, city , state, pcode = getusaddress(ploc)
     street1, city1 , state1, pcode1 = getusaddress(pmail)
     try:
