@@ -29,30 +29,22 @@ def searchbyname():
         return(checkbarcodeid(str(request.args.get('barcode')),str(request.args.get('name'))))
     except:
         pass
-
-    return json.dumps({'status':'Error'})
-        
-    
-    
-        
-
-    
-   
-    
     return json.dumps({'status':'Error'})
 
 @app.route("/searchbytaxid")
 def searchbytaxid():
-
     try:   
         return(checktaxid(str(request.args.get('taxid'))))
     except:
-        pass
-    
+        pass 
+    return json.dumps({'status':'Error'})
 
-    
-   
-    
+@app.route("/searchbynpi")
+def searchbynpi():
+    try:   
+        return(checktaxid(str(request.args.get('npiid'))))
+    except:
+        pass 
     return json.dumps({'status':'Error'})
   
  
