@@ -42,7 +42,7 @@ def searchbytaxid():
 @app.route("/searchbynpi")
 def searchbynpi():
     try:   
-        return(checktaxid(str(request.args.get('npiid'))))
+        return(checknpiid(str(request.args.get('npiid'))))
     except:
         pass 
     return json.dumps({'status':'Error'})
