@@ -135,6 +135,7 @@ def checknpiid(npiid):
     if len(npiid) < 2:
         return json.dumps({'status':'Error'})
     myquery = ''
+    npi = "N/A"; provider_name="N/A"; ploc="N/A"; pmail = "N/A"; npientity="N/A"; otherorg = "N/A"; othername="N/A"; taxcode="N/A"; classif="N/A"; phone = "N/A"; fax = "N/A"
     query=str(npiid)
     page = requests.post(str(url)+query, headers=headers)
     soup = BeautifulSoup(page.text,'html.parser')
