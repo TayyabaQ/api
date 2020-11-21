@@ -4,6 +4,7 @@ from waitress import serve
 import json, datetime
 from searchbytaxid import checktaxid
 from searchbyname import checkbarcodeid
+from searchbynpi import checknpiid
 app = Flask(__name__)
 
 
