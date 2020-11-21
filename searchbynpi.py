@@ -108,89 +108,72 @@ def Remove(duplicate):
             final_list.append(num.strip())
     return ', '.join(final_list)
 
-def getusaddress(addr):
-    address = usaddress.parse(addr)
-    m = 0;street = "";city = "";state = "";pcode = ""
-    while m < len(address):
-        temp = address[m]
-        if temp[1].find("Address") != -1 or temp[1].find("Street") != -1 or temp[1].find('Occupancy') != -1 or temp[1].find("Recipient") != -1 or temp[1].find("BuildingName") != -1 or temp[1].find("USPSBoxType") != -1 or temp[1].find("USPSBoxID") != -1:
-            street = street + " " + temp[0]
-        if temp[1].find("PlaceName") != -1:
-            city = city + " " + temp[0]
-        if temp[1].find("StateName") != -1:
-            state = state + " " + temp[0]
-        if temp[1].find("ZipCode") != -1:
-            pcode = pcode + " " + temp[0]
-        m += 1
-    street = street.lstrip().replace(',','')
-    city = city.lstrip().replace(',','')
-    state = state.lstrip().replace(',','')
-    pcode = pcode.lstrip().replace(',','')
-    return (street, city , state, pcode)
+def checktaxid(taxid):
+    headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36',
+           'x-requested-with': 'XMLHttpRequest'
 
-def checknpiid(npiid):
-    url = 'https://npiprofile.com/npi/'
-    if len(npiid) < 2:
-        return json.dumps({'status':'Error'})
+           }
     myquery = ''
-    query=str(npiid)
-    page = requests.post(str(url)+query)
+    url = 'https://eintaxid.com/search-ajax.php'
+    if len(taxid) < 2:
+        return json.dumps({'status':'Error'})
+    myobj = {'query': str(taxid)}
+    page = requests.post(url, data = myobj,headers=headers)
     soup = BeautifulSoup(page.text,'html.parser')
-    table = soup.find( "table", {"id":"table-npi-provider-information"} )
-    if table == None:
+    divlist = soup.findAll('div',{'class':'fixed-panel'})
+    if len(divlist) == 0:
         return json.dumps({'status':'Not Found'})
-    rows=list()
-    for row in table.findAll("tr"):
-        rows.append(row)
-    for n in range(0,len(rows)):
-            n = rows[n].get_text()
-            if "NPI" in n and " " not in n:
-                    npi = n.replace("NPI","")
-            if "Provider Name" in n:
-                    provider_name = n.replace("Provider Name", "")
-            if "Provider Location Address" in n:
-                    ploc = n.replace("Provider Location Address", "")
-            if "Provider Mailing Address" in n:
-                    pmail = n.replace("Provider Mailing Address", "")
-            if "NPI Entity Type" in n:
-                    npientity = n.replace("NPI Entity Type", "")
-            if "Other Organization Name" in n:
-                    otherorg = n.replace("Other Organization Name", "")
-            if "Other Name Type" in n:
-                    othername = n.replace("Other Name Type", "")
-    table = soup.find( "table", {"id":"table-primary-taxonomy"} )
-    rows=list()
-    for row in table.findAll("tr"):
-        rows.append(row)
-    for n in range(0,len(rows)):
-            n = rows[n].get_text()
-            if "Taxonomy Code" in n:
-                taxcode = n.replace("Taxonomy Code","")
-            if "Classification" in n:
-                classif = n.replace("Classification", "")
-    phone = soup.find( "div", {"id":"npi-addresses"} )
-    fax = phone.get_text().split("Phone:")[1].strip().split("\n")[0].split("Fax")[1].strip().replace(":","").strip()
-    phone = phone.get_text().split("Phone:")[1].strip().split("\n")[0].split("Fax")[0].strip()
-    street, city , state, pcode = getusaddress(ploc)
-    street1, city1 , state1, pcode1 = getusaddress(pmail)
-    try:
-        input_data = read_input_values(myquery,street,city,state)
-        ploc_barcode= str(smarty_streets_validation(input_data))
+    
+    for div in divlist:   
+        companylink = 'https://eintaxid.com' + soup.find('a')['href']
+        content = div.text.lstrip()
+        title = content.split('EIN Number',1)[0]
+        einnumber = content.split('EIN Number: ',1)[1].split('Address',1)[0]
+        address = content.split('Address: ',1)[1].split('Phone',1)[0]
+        print(address)
+        phone = content.split('Phone: ',1)[1]
+        fulladdress = Remove(address.split(","))
         try:
-            ploc_barcode = barcode.split('.',1)[0]
+            zipcode= fulladdress.split(' ')[-1].split('-')[0]
+            fulladdress = fulladdress.replace(fulladdress.split(' ')[-1],zipcode)
         except:
             pass
-    except:
-        ploc_barcode = "N/A"
-    try:
-        input_data = read_input_values(myquery,street1,city1,state1)
-        pmail_barcode= str(smarty_streets_validation(input_data))
+        address = usaddress.parse(address)
+        m = 0
+        street = ""
+        city = ""
+        state = ""
+        pcode = ""
+        while m < len(address):
+            temp = address[m]
+            if temp[1].find("Address") != -1 or temp[1].find("Street") != -1 or temp[1].find('Occupancy') != -1 or temp[1].find("Recipient") != -1 or temp[1].find("BuildingName") != -1 or temp[1].find("USPSBoxType") != -1 or temp[1].find("USPSBoxID") != -1:
+                street = street + " " + temp[0]
+            if temp[1].find("PlaceName") != -1:
+                city = city + " " + temp[0]
+            if temp[1].find("StateName") != -1:
+                state = state + " " + temp[0]
+            if temp[1].find("ZipCode") != -1:
+                pcode = pcode + " " + temp[0]
+            m += 1
+
+        street = street.lstrip().replace(',','')
+        city = city.lstrip().replace(',','')
+        state = state.lstrip().replace(',','')
+        pcode = pcode.lstrip().replace(',','')
         try:
-            pmail_barcode = barcode.split('.',1)[0]
-        except:
-            pass
-    except:
-        pmail_barcode = "N/A"
-    return json.dumps({'status':'Found','Result':{'provider_npi':str(npi),'provider_name':provider_name,'provider_loc_add':ploc,'provider_mail_add':pmail,'npi_entity_type':npientity,
-                                                  'other_org_name':otherorg, 'other_name_type':othername, 'taxonomy_code':taxcode, 'classification':classif, 'business_phone': phone,
-                                                      'business_fax':fax, 'ploc_barcode':ploc_barcode, 'pmail_barcode':pmail_barcode}})
+            input_data = read_input_values(myquery,street,city,state)
+            barcode= str(smarty_streets_validation(input_data))
+            #print(barcode)
+            try:
+                barcode = barcode.split('.',1)[0]
+            except:
+                pass
+        except Exception as e:
+            print(e)
+            return json.dumps({'status':'Found','Result':{'name':title,'barcode':"N/A",'ein_number':str(einnumber),'Address':fulladdress,
+                                                      'phone':phone.strip()}})
+        return json.dumps({'status':'Found','Result':{'name':title,'barcode':barcode,'ein_number':str(einnumber),'Address':fulladdress,
+                                                      'phone':phone.strip()}})
+           
+        #return json.dumps({'status':'Found','Result':{'name':title,'barcode':barcode,'ein_number':str(einnumber),'street':street,'city':city,'state':state,'zip':pcode,'phone':phone.strip()}
+           # })
