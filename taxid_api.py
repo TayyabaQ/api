@@ -5,6 +5,7 @@ import json, datetime
 from searchbytaxid import checktaxid
 from searchbyname import checkbarcodeid
 from searchbynpi import checknpiid
+from searchbynpiname import checknpiname
 app = Flask(__name__)
 
 
@@ -44,6 +45,14 @@ def searchbytaxid():
 def searchbynpi():
     try:   
         return(checknpiid(str(request.args.get('npiid'))))
+    except:
+        pass 
+    return json.dumps({'status':'Error'})
+
+@app.route("/searchbynpiname")
+def searchbynpiname():
+    try:   
+        return(checknpiname(str(request.args.get('name')),str(request.args.get('barcode'))))
     except:
         pass 
     return json.dumps({'status':'Error'})
