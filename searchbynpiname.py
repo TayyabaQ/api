@@ -84,8 +84,9 @@ def checknpiname(pname, address):
                             return json.dumps({'status':'Not Found'})
     npi = soup.findAll('td',{'data-title':'NPI'})
     name = soup.findAll('td',{'data-title':'Name'})
+    typess = [types for n in range(0,len(name))]
     for n in range(0,len(npi)):
-        myresult.append({'provider_npi':str(npi[n].get_text()),'provider_name':str(name[n].get_text()),'type':types})
+        myresult.append({'provider_npi':str(npi[n].get_text()),'provider_name':str(name[n].get_text()),'type':str(typess[n])})
     if len(myresult) > 0:
         return json.dumps({'status':'Found','Result':myresult})
     else:
