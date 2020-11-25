@@ -52,7 +52,7 @@ def searchbynpi():
 @app.route("/searchbynpiname")
 def searchbynpiname():
     try:   
-        return(checknpiname(str(request.args.get('name')),str(request.args.get('barcode'))))
+        return(checknpiname(str(request.args.get('name')),str(request.args.get('address'))))
     except:
         pass 
     return json.dumps({'status':'Error'})
