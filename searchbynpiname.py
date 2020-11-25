@@ -39,7 +39,7 @@ def getusaddress(addr):
     return (street, city , state, pcode)
 
 def checknpiname(pname, address):
-    myresult = []
+    myresult = []; types=""
     street, city, state, pcode = getusaddress(address)
     queryname = str(pname).replace(" ","%20").replace("'S","").replace("'s","").split("(")[0].strip()
     url = "https://npiprofile.com/search-advanced.php?sNPI=&sEntity_Type_Code=2&sTaxonomy_Code=&sProvider_First_Name=&sProvider_Last_Name_Legal_Name=&sProvider_Business_Name="+queryname+"&sProvider_Address="+street.strip()+"&sProvider_City="+city.strip()+"&sProvider_State="+state.strip()+"&sProvider_Postal_Code=&sProvider_Telephone_Number=&sIsPecos="
@@ -58,28 +58,28 @@ def checknpiname(pname, address):
             soup = BeautifulSoup(page.text,'html.parser')
             divlist = soup.findAll('td',{'data-title':'NPI'})
             print(len(divlist))
-            tyep = 2
+            types = 2
             if len(divlist) == 0:
                 url = "https://npiprofile.com/search-advanced.php?sNPI=&sEntity_Type_Code=2&sTaxonomy_Code=&sProvider_First_Name=&sProvider_Last_Name_Legal_Name=&sProvider_Business_Name="+queryname+"&sProvider_Address=&sProvider_City=&sProvider_State="+state.strip()+"&sProvider_Postal_Code=&sProvider_Telephone_Number=&sIsPecos="
                 page = requests.post(url, headers=headers)
                 soup = BeautifulSoup(page.text,'html.parser')
                 divlist = soup.findAll('td',{'data-title':'NPI'})
                 print(len(divlist))
-                type = 3
+                types = 3
                 if len(divlist) == 0:
                     url = "https://npiprofile.com/search-advanced.php?sNPI=&sEntity_Type_Code=2&sTaxonomy_Code=&sProvider_First_Name=&sProvider_Last_Name_Legal_Name=&sProvider_Business_Name="+queryname+"&sProvider_Address=&sProvider_City=&sProvider_State=&sProvider_Postal_Code=&sProvider_Telephone_Number=&sIsPecos="
                     page = requests.post(url, headers=headers)
                     soup = BeautifulSoup(page.text,'html.parser')
                     divlist = soup.findAll('td',{'data-title':'NPI'})
                     print(len(divlist))
-                    type = 4
+                    types = 4
                     if len(divlist) == 0:
                         url = "https://npiprofile.com/search-advanced.php?sNPI=&sEntity_Type_Code=2&sTaxonomy_Code=&sProvider_First_Name=&sProvider_Last_Name_Legal_Name=&sProvider_Business_Name=&sProvider_Address="+street.strip()+"&sProvider_City="+city.strip()+"&sProvider_State="+state.strip()+"&sProvider_Postal_Code=&sProvider_Telephone_Number=&sIsPecos="
                         page = requests.post(url, headers=headers)
                         soup = BeautifulSoup(page.text,'html.parser')
                         divlist = soup.findAll('td',{'data-title':'NPI'})
                         print(len(divlist))
-                        type = 5
+                        types = 5
                         if len(divlist) == 0:
                             return json.dumps({'status':'Not Found'})
     npi = soup.findAll('td',{'data-title':'NPI'})
