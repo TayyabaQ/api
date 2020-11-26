@@ -57,17 +57,28 @@ def checknpiname(pname, address):
             page = requests.post(urls)
             soup = BeautifulSoup(page.text,'html.parser')
             divlist = soup.findAll('td',{'data-title':'NPI'})
-            print(len(divlist))
             types = 2
             if len(divlist) == 0:
                 url = "https://npiprofile.com/search-advanced.php?sNPI=&sEntity_Type_Code=2&sTaxonomy_Code=&sProvider_First_Name=&sProvider_Last_Name_Legal_Name=&sProvider_Business_Name="+queryname+"&sProvider_Address=&sProvider_City=&sProvider_State="+state.strip()+"&sProvider_Postal_Code=&sProvider_Telephone_Number=&sIsPecos="
                 page = requests.post(url, headers=headers)
                 soup = BeautifulSoup(page.text,'html.parser')
                 divlist = soup.findAll('td',{'data-title':'NPI'})
-                print(len(divlist))
                 types = 3
                 if len(divlist) == 0:
-                    return json.dumps({'status':'Not Found'})
+                    url = "https://npiprofile.com/search-advanced.php?sNPI=&sEntity_Type_Code=2&sTaxonomy_Code=&sProvider_First_Name=&sProvider_Last_Name_Legal_Name=&sProvider_Business_Name="+queryname+"&sProvider_Address=&sProvider_City=&sProvider_State=&sProvider_Postal_Code=&sProvider_Telephone_Number=&sIsPecos="
+                    page = requests.post(url, headers=headers)
+                    soup = BeautifulSoup(page.text,'html.parser')
+                    divlist = soup.findAll('td',{'data-title':'NPI'})
+                    types = 4
+                    if len(divlist) == 0:
+                        time.sleep(1)
+                        url = "https://npiprofile.com/search-advanced.php?sNPI=&sEntity_Type_Code=2&sTaxonomy_Code=&sProvider_First_Name=&sProvider_Last_Name_Legal_Name=&sProvider_Business_Name=&sProvider_Address="+street.strip()+"&sProvider_City="+city.strip()+"&sProvider_State="+state.strip()+"&sProvider_Postal_Code=&sProvider_Telephone_Number=&sIsPecos="
+                        page = requests.post(url, headers=headers)
+                        soup = BeautifulSoup(page.text,'html.parser')
+                        divlist = soup.findAll('td',{'data-title':'NPI'})
+                        types = 5
+                        if len(divlist) == 0:
+                            return json.dumps({'status':'Not Found'})
     npi = soup.findAll('td',{'data-title':'NPI'})
     name = soup.findAll('td',{'data-title':'Name'})
     typess = [types for n in range(0,len(name))]
