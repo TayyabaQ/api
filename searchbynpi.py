@@ -135,7 +135,7 @@ def checknpiid(npiid):
     if len(npiid) < 2:
         return json.dumps({'status':'Error'})
     myquery = ''
-    npi = "N/A"; provider_name="N/A"; ploc="N/A"; pmail = "N/A"; npientity="N/A"; otherorg = "N/A"; othername="N/A"; taxcode="N/A"; classif="N/A"; phone = "N/A"; fax = "N/A"
+    npi = "N/A"; provider_name="N/A"; ploc="N/A"; pmail = "N/A"; npientity="N/A"; otherorg = "N/A"; othername="N/A"; taxcode="N/A"; classif="N/A"; phone = "N/A"; fax = "N/A";lastupdated="N/A"
     query=str(npiid)
     page = requests.post(str(url)+query, headers=headers)
     soup = BeautifulSoup(page.text,'html.parser')
@@ -161,6 +161,8 @@ def checknpiid(npiid):
                     otherorg = n.replace("Other Organization Name", "")
             if "Other Name Type" in n:
                     othername = n.replace("Other Name Type", "")
+            if "Last Update" in n:
+                    lastupdated = n.replace("Last Update Date","")
     table = soup.find( "table", {"id":"table-primary-taxonomy"} )
     rows=list()
     for row in table.findAll("tr"):
@@ -202,4 +204,4 @@ def checknpiid(npiid):
         pmail_barcode = "N/A"
     return json.dumps({'status':'Found','Result':{'provider_npi':str(npi),'provider_name':provider_name,'provider_loc_add':ploc,'provider_mail_add':pmail,'npi_entity_type':npientity,
                                                   'other_org_name':otherorg, 'other_name_type':othername, 'taxonomy_code':taxcode, 'classification':classif, 'business_phone': phone,
-                                                      'business_fax':fax, 'ploc_barcode':ploc_barcode, 'pmail_barcode':pmail_barcode}})
+                                                      'business_fax':fax, 'ploc_barcode':ploc_barcode, 'pmail_barcode':pmail_barcode, 'last_updated':lastupdated}})
