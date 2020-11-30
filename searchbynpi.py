@@ -193,15 +193,6 @@ def checknpiid(npiid):
             pass
     except:
         ploc_barcode = "N/A"
-    try:
-        input_data = read_input_values(myquery,street1,city1,state1)
-        pmail_barcode= str(smarty_streets_validation(input_data))
-        try:
-            pmail_barcode = barcode.split('.',1)[0]
-        except:
-            pass
-    except:
-        pmail_barcode = "N/A"
     return json.dumps({'status':'Found','Result':{'provider_npi':str(npi),'provider_name':provider_name,'provider_loc_add':ploc,'provider_mail_add':pmail,'npi_entity_type':npientity,
                                                   'other_org_name':otherorg, 'other_name_type':othername, 'taxonomy_code':taxcode, 'classification':classif, 'business_phone': phone,
-                                                      'business_fax':fax, 'ploc_barcode':ploc_barcode, 'pmail_barcode':pmail_barcode, 'last_updated':lastupdated}})
+                                                      'business_fax':fax, 'ploc_barcode':ploc_barcode, 'last_updated':lastupdated}})
