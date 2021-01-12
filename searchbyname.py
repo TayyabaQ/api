@@ -172,7 +172,7 @@ def checkbarcodeid(inbar,name,incity, instate,flag):
             pass
         
         #print(barcode)
-        if flag==True:
+        if flag=="True":
             if (str(inbar.strip()) in str(barcode).strip()) or (str(barcode.strip()) in str(inbar.strip())) or (incity.strip().lower() == city.lower() and instate.strip().lower()==state.lower()):
                 myresult.append({'name':title,'barcode':barcode,'ein_number':str(einnumber),'street':street,'city':city,'state':state,'zip':pcode,'phone':phone.strip()})
         else:
