@@ -102,14 +102,9 @@ def smarty_streets_validation(input_data):
     return bar
 
 
-def Remove(duplicate):
-    final_list = []
-    for num in duplicate:
-        if num.strip() not in final_list:
-            final_list.append(num.strip())
-    return ', '.join(final_list)
 
-def checkbarcodeid(inbar,name):
+
+def checkbarcodeid(inbar,name,incity, instate,flag):
     myresult = []
     headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36',
            'x-requested-with': 'XMLHttpRequest'
@@ -120,6 +115,7 @@ def checkbarcodeid(inbar,name):
     
     if len(inbar) < 2 and len(name) < 2:
         return json.dumps({'status':'Error'})
+    
     
     inputstr = name
     if len(inputstr) > 2:
@@ -138,13 +134,7 @@ def checkbarcodeid(inbar,name):
         einnumber = content.split('EIN Number: ',1)[1].split('Address',1)[0]
         address = content.split('Address: ',1)[1].split('Phone',1)[0]
         phone = content.split('Phone: ',1)[1]
-        fulladdress = Remove(address.split(","))
-        try:
-            zipcode= fulladdress.split(' ')[-1].split('-')[0]
-            fulladdress = fulladdress.replace(fulladdress.split(' ')[-1],zipcode)
-        except:
-            pass
-        address = usaddress.parse(fulladdress)
+        address = usaddress.parse(address)
         m = 0
         street = ""
         city = ""
@@ -161,7 +151,6 @@ def checkbarcodeid(inbar,name):
             if temp[1].find("ZipCode") != -1:
                 pcode = pcode + " " + temp[0]
             m += 1
-
         street = street.lstrip().replace(',','')
         city = city.lstrip().replace(',','')
         state = state.lstrip().replace(',','')
@@ -177,18 +166,21 @@ def checkbarcodeid(inbar,name):
         except Exception as e:
             #print(e)
             return json.dumps({'status':'Error'})
-            
-           
         try:
             inbar = inbar.split('.',1)[0]
         except:
             pass
-
-        if (str(inbar.strip()) in str(barcode).strip()) or (str(barcode.strip()) in str(inbar.strip())):
-            myresult.append({'name':title,'barcode':barcode,'ein_number':str(einnumber),'Address':fulladdress,'phone':phone.strip()})
-            
+        
+        #print(barcode)
+        if flag==True:
+            if (str(inbar.strip()) in str(barcode).strip()) or (str(barcode.strip()) in str(inbar.strip())) or (incity.strip().lower() == city.lower() and instate.strip().lower()==state.lower()):
+                myresult.append({'name':title,'barcode':barcode,'ein_number':str(einnumber),'street':street,'city':city,'state':state,'zip':pcode,'phone':phone.strip()})
+        else:
+            if (str(inbar.strip()) in str(barcode).strip()) or (str(barcode.strip()) in str(inbar.strip())):
+                myresult.append({'name':title,'barcode':barcode,'ein_number':str(einnumber),'street':street,'city':city,'state':state,'zip':pcode,'phone':phone.strip()})
     if len(myresult) > 0:
         return json.dumps({'status':'Found','Result':myresult})
-    else:
-        
+    else:  
         return json.dumps({'status':'Not Matched'})
+    
+  
