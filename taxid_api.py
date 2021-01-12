@@ -28,7 +28,7 @@ def index():
 @app.route("/searchbyname")
 def searchbyname():
     try:
-        return(checkbarcodeid(str(request.args.get('barcode')),str(request.args.get('name'))))
+        return(checkbarcodeid(str(request.args.get('barcode')),str(request.args.get('name')),str(request.args.get('incity')),str(request.args.get('instate')),str(request.args.get('flag'))))
     except:
         pass
     return json.dumps({'status':'Error'})
