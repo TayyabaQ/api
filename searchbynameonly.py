@@ -98,6 +98,7 @@ def smarty_streets_validation(input_data):
                                   'state_abbreviation': sta,
                                   'zipcode': zipc,
                                   'barcode':bar}
+        
     return bar
 
 
@@ -107,9 +108,15 @@ def checkbarcodeid(name):
     myresult = []
     headers = {'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.142 Safari/537.36',
            'x-requested-with': 'XMLHttpRequest'
+
            }
     myquery = ''
     url = 'https://eintaxid.com/search-ajax.php'
+    
+    if len(name) < 2:
+        return json.dumps({'status':'Error'})
+    
+    
     inputstr = name
     if len(inputstr) > 2:
         myquery = str(inputstr)
@@ -120,10 +127,15 @@ def checkbarcodeid(name):
       
         if len(divlist) == 0:
             return json.dumps({'status':'Not Found'})
+    
+   
+
+    
     for div in divlist:
         mycheck = 0
         companylink = 'https://eintaxid.com' + soup.find('a')['href']
         content = div.text.lstrip()
+        
         title = content.split('EIN Number',1)[0]
         if title.lower().strip() == name.lower().strip():
             mycheck = 1
@@ -153,6 +165,7 @@ def checkbarcodeid(name):
             if temp[1].find("ZipCode") != -1:
                 pcode = pcode + " " + temp[0]
             m += 1
+
         street = street.lstrip().replace(',','')
         city = city.lstrip().replace(',','')
         state = state.lstrip().replace(',','')
@@ -160,20 +173,31 @@ def checkbarcodeid(name):
         try:
             input_data = read_input_values(myquery,street,city,state)
             barcode= str(smarty_streets_validation(input_data))
+           
             try:
                 barcode = barcode.split('.',1)[0]
             except:
                 pass
         except:
-            return json.dumps({'status':'Error'}
+           
+            return json.dumps({'status':'Error'})
+            
+           
+        
+
+        
         
         if  mycheck == 1:
-            myresult.append({'name':title,'barcode':barcode,'ein_number':str(einnumber),'Address':fulladdress,'phone':phone.strip()})              
+            myresult.append({'name':title,'barcode':barcode,'ein_number':str(einnumber),'Address':fulladdress,'phone':phone.strip()})
+            
+                        
     if len(myresult) > 0:
+        
         return json.dumps({'status':'Found','Result':myresult})
     else:
+        
         return json.dumps({'status':'Not Matched'})
 
 
-
+#checkbarcodeid('3M company')
 
