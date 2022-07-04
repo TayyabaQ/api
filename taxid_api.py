@@ -4,6 +4,7 @@ from waitress import serve
 import json, datetime
 from searchbytaxid import checktaxid
 from searchbyname import checkbarcodeid
+from searchbynameonly import checkbarcodeid
 from searchbynpi import checknpiid
 from searchbynpiname import checknpiname
 app = Flask(__name__)
@@ -36,7 +37,7 @@ def searchbyname():
 @app.route("/searchbynameonly")
 def searchbynameonly():
     try:
-        return(checkbarcodeid(str(str(request.args.get('name')))))
+        return(checkbarcodeid(str(request.args.get('name'))))
     except:
         pass
     return json.dumps({'status':'Error'})
