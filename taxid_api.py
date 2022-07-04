@@ -33,6 +33,14 @@ def searchbyname():
         pass
     return json.dumps({'status':'Error'})
 
+@app.route("/searchbynameonly")
+def searchbynameonly():
+    try:
+        return(checkbarcodeid(str(str(request.args.get('name')))))
+    except:
+        pass
+    return json.dumps({'status':'Error'})
+
 @app.route("/searchbytaxid")
 def searchbytaxid():
     try:   
